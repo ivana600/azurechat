@@ -28,6 +28,23 @@ const configureIdentityProvider = () => {
     );
   }
 
+  if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+    providers.push(
+      GoogleProvider({
+        clientId: process.env.GOOGLE_CLIENT_ID!,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+        async profile(profile) {
+          const newProfile = {
+            ...profile,
+            id: profile.sub,
+            isAdmin: adminEmails.includes(profile.email.toLowerCase())
+          };
+          return newProfile;
+        },
+      })
+    );
+  }
+
   if (
     process.env.AZURE_AD_CLIENT_ID &&
     process.env.AZURE_AD_CLIENT_SECRET &&
@@ -49,23 +66,6 @@ const configureIdentityProvider = () => {
           };
           return newProfile;
         },
-      })
-    );
-  }
-
-  if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
-    providers.push(
-      GoogleProvider({
-        clientId: process.env.GOOGLE_CLIENT_ID!,
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-        async profile(profile) {
-          const newProfile = {
-            ...profile,
-            id: profile.sub,
-            isAdmin: adminEmails.includes(profile.email.toLowerCase())
-          }
-          return newProfile;
-        }
       })
     );
   }
