@@ -53,6 +53,23 @@ const configureIdentityProvider = () => {
     );
   }
 
+  if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+    providers.push(
+      GoogleProvider({
+        clientId: process.env.GOOGLE_CLIENT_ID!,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+        async profile(profile) {
+          const newProfile = {
+            ...profile,
+            id: profile.sub,
+            isAdmin: adminEmails.includes(profile.email.toLowerCase())
+          }
+          return newProfile;
+        }
+      })
+    );
+  }
+
   // If we're in local dev, add a basic credential provider option as well
   // (Useful when a dev doesn't have access to create app registration in their tenant)
   // This currently takes any username and makes a user with it, ignores password
